@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCosmic } from '@/lib/cosmic-preview';
 import {
+  cosmic,
   fetchAllNewsroomStories,
   fetchNewsroomStoryBySlug,
   getMetafieldValue,
@@ -16,8 +17,9 @@ interface NewsroomStoryPageProps {
 }
 
 export async function generateStaticParams() {
-  const { cosmic, previewToken } = await getCosmic();
-  const stories = await fetchAllNewsroomStories(cosmic, previewToken);
+  // This runs at build time, outside of any request scope, so it must not
+  // read cookies(). Use the plain read-only client with no preview token.
+  const stories = await fetchAllNewsroomStories(cosmic);
   return stories.map((story) => ({ slug: story.slug }));
 }
 
