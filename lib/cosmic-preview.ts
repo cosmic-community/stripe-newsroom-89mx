@@ -16,7 +16,9 @@ export async function getCosmic(): Promise<GetCosmicResult> {
     bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
     readKey: process.env.COSMIC_READ_KEY as string,
     writeKey: process.env.COSMIC_WRITE_KEY as string,
-    apiEnvironment: 'staging',
+    // Do not set apiEnvironment: when a previewToken is present the SDK
+    // already resolves draft content, and forcing 'staging' would serve
+    // unpublished content to normal visitors too.
     ...(previewToken ? { previewToken } : {}),
   });
 
