@@ -1,0 +1,24 @@
+import { cookies } from 'next/headers';
+import { createBucketClient } from '@cosmicjs/sdk';
+
+type CosmicClient = ReturnType<typeof createBucketClient>;
+
+interface GetCosmicResult {
+  cosmic: CosmicClient;
+  previewToken: string | null;
+}
+
+export async function getCosmic(): Promise<GetCosmicResult> {
+  const cookieStore = await cookies();
+  const previewToken = cookieStore.get('cosmic_preview')?.value ?? null;
+
+  const cosmic = createBucketClient({
+    bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
+    readKey: process.env.COSMIC_READ_KEY as string,
+    writeKey: process.env.COSMIC_WRITE_KEY as string,
+    apiEnvironment: 'staging',
+    ...(previewToken ? { previewToken } : {}),
+  });
+
+  return { cosmic, previewToken };
+}
